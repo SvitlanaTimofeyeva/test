@@ -1,5 +1,4 @@
 ﻿var mssql = require('mssql'); 
-var config = require('./connection_pool');  
 
 var path = require('path'); 
 

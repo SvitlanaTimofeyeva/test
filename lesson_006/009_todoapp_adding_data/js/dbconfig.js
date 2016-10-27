@@ -16,4 +16,6 @@ var config = {
 	
 } 
 
-module.exports = config;  
+var connection = new mssql.Connection(config); 
+
+module.exports = connection; 
