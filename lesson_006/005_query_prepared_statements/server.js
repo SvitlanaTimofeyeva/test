@@ -29,19 +29,39 @@ app.use(function(req, res) {
 
 	connection.connect(function(err){
 		
-
-		var request = new mssql.Request(connection);  
+		// конструктор для предварительного форматирования запросов к бд - PreparedStatement
 		
-		request.query('SELECT * FROM items WHERE id=1', function(err, data) {
-			if (err) console.log(err); 
-			else {
+	
+			var ps = new mssql.PreparedStatement(connection); 
+			
+			// метод input позволяет указать значение параметра, который будет использован в запросе  
+			// аргументы: 
+			
+			// name - имя параметра 
+			// type - SQL тип данных 
+			
+			ps.input('param', mssql.Int);
+			
+			// подготовка запроса 
+			ps.prepare('SELECT * FROM items WHERE id=@param ', function(err) {
 				
-				console.log(data); 
-				res.send(data[0].description); 
-				
-			}
+				if (err) console.log(err); 
 
-		}) 
+				// выполнение запроса 
+				ps.execute({param: 2}, function(err, recordset) {
+					if (err) console.log(err); 
+					
+					res.send(recordset[0].description); 
+					console.log('prepared statement executed'); 
+					
+					
+					// метод unprepare возвращает текущее соединение в пул соединений 
+					ps.unprepare(function(err) {
+						if (err) console.log(err); 
+						console.log('statement unprepared')
+					});
+				});
+			})
 		
 	})
 }); 
