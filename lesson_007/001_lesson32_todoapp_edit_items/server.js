@@ -37,10 +37,10 @@ app.post('/add/newItem', insertHandler.addRow);
 app.get('/edit', displayHandler.displayItems); 
 
 // загрузка страницы для редактирования элементов 
-app.get('/edit/:id', editHandler.loadEditPage);
+//app.get('/edit/:id', editHandler.loadEditPage);
 
 // редактирование элемента в бд 
-app.put('/edit/:id', editHandler.changeItem);
+//app.put('/edit/:id', editHandler.changeItem);
 
 // обработка ошибок 
 app.use(function(err, req, res, next) {

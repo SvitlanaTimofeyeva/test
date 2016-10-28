@@ -1,7 +1,7 @@
 ﻿var mssql = require('mssql');
 var displayHandler = require('./displayhandler');  
 
-var connection = require('./dbconfig'); 
+var connection = require('./config'); 
 
 module.exports = {
 
@@ -26,6 +26,7 @@ module.exports = {
 			}); 
 			
 			request.on('done', function(affected) { 
+				console.log('show_items'); 
 				res.render('index', { data:  self.tableRows }); 
 			})		
 
@@ -51,10 +52,12 @@ module.exports = {
 				   ps.input('completed', mssql.Int); 
 				   
 				   ps.prepare("INSERT INTO items (name, description, completed) VALUES (@name , @description, @completed)", function(err) { 
-						console.log(err); 
-					    var request = ps.execute(inserts, function(err) {
+						if (err) console.log(err); 
+					    var request = ps.execute(inserts, function(err) { 
+						
 							console.log(err); 
-							ps.unprepare(); 
+							console.log('add item'); 
+
 						}); 
 				
 				
