@@ -1,93 +1,132 @@
 ﻿// соединение с бд 
-var pool = require('./db_handler');
-var mysql = require('mysql');
+var connection = require('./db_handler');
+var mssql = require('mssql');
 var path = require('path'); 
 
 module.exports = {
-    // згрузка всех элементов
+    // загрузка всех элементов
     loadItems: function (req, res) {
 
-        // подключение к бд 
-        pool.getConnection(function (err, connection) {
+		// подключение к бд 
+		var request = new mssql.Request(connection);  
 
-            if (err) console.log(err)
-
-            connection.query('SELECT * FROM `items`', function (err, rows) {
-                res.json(rows);
-                connection.release();
-            });
-        });
+		request.query("SELECT * FROM items", function(err, rows) {
+			
+			if (err) console.log(err); 
+			console.log('GET ' + req.url);
+			res.json(rows); 
+		}); 
 
     },
     // загрузка элемента из бд по id 
     getItemById: function (req, res) {
 
-        // подключение к бд 
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
-
-            connection.query('SELECT * FROM `items` WHERE id=?', req.params.id, function (err, rows) {
-
-                console.log('item selected');
-                res.json(rows[0]);
-                connection.release();
-            });
-        });
+		// подключение к бд 
+		var ps = new mssql.PreparedStatement(connection);   
+		
+		var inserts = {
+			id: parseInt(req.params.id)  
+		} 
+		
+		ps.input('id', mssql.Int); 
+		
+		ps.prepare('SELECT * FROM items WHERE id=@id', function(err) {
+			if (err) console.log(err); 
+			
+			ps.execute(inserts, function(err, rows) { 
+			
+					if (err) console.log(err); 
+				
+					console.log('GET ' + req.url);
+					res.json(rows[0]);  
+					ps.unprepare();  
+					
+			}); 
+		}); 
     },
     // создание элемента 
     createItem: function (req, res) {
 
-        // подключение к бд 
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
-            var data = req.body;
+        // подключение к бд  
+		var ps = new mssql.PreparedStatement(connection);   
+		
+		var data = req.body;
+		
+		var inserts = {
+			name: data.name, 
+			description: data.description, 
+			completed: parseInt(data.completed)
+		} 
+		
+		ps.input('name', mssql.Text); 
+		ps.input('description', mssql.Text); 
+		ps.input('completed', mssql.Int); 
+		
+		ps.prepare("INSERT INTO items (name, description, completed) VALUES (@name, @description, @completed)", function(err) {
+			if (err) console.log(err); 
+			
+			ps.execute(inserts, function(err, rows) {
 
-            var sql = 'INSERT INTO `items`(name, description, completed) VALUES (?, ?, ?)';
-            var inserts = [data.name, data.description, data.completed];
-            sql = mysql.format(sql, inserts);
-
-            connection.query(sql, function (err, rows) {
-
-                console.log('item created');
-                res.send('item created');
-                connection.release();
-            });
-        })
+                 console.log('item created');
+                 res.send('item created'); 
+				 
+				 ps.unprepare(); 
+			}); 
+		});
     },
     // обновление элемента (редактирование) 
-    updateItem: function (req, res) {
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
-            var data = req.body;
-
-            var sql = 'UPDATE `items` SET name=?, description=?, completed=? WHERE id=?';
-            var inserts = [data.name, data.description, data.completed, data.id];
-            sql = mysql.format(sql, inserts);
-
-            connection.query(sql, function (err, rows) {
-
-                console.log('item updated');
+    updateItem: function (req, res) { 
+	
+		var ps = new mssql.PreparedStatement(connection);   
+		
+		var data = req.body;
+		
+		var inserts = {
+			name: data.name, 
+			description: data.description, 
+			completed: parseInt(data.completed), 
+			id: parseInt(data.id) 
+		} 
+		
+		ps.input('name', mssql.Text); 
+		ps.input('description', mssql.Text); 
+		ps.input('completed', mssql.Int);  
+		ps.input('id', mssql.Int); 
+		
+		ps.prepare('UPDATE items SET name=@name, description=@description, completed=@completed WHERE id=@id', function(err) {
+			if (err) console.log(err); 
+			
+			ps.execute(inserts, function(err, rows) {
+				if (err) console.log(err); 
+				
+				console.log('PUT ' + req.url);
                 res.send('item updated');
-                connection.release();
-            })
-        })
+				ps.unprepare(); 
+			}); 
+		}); 
     },
     // удаление элемента 
     removeItem: function (req, res) {
 
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
-
-            var sql = 'DELETE FROM `items` WHERE id=?';
-            var inserts = req.params.id;
-            sql = mysql.format(sql, inserts);
-
-            connection.query(sql, function (err, rows) {
-
-                console.log('item deleted');
-                res.send('item deleted');
-                connection.release();
-            })
-        })
+		var ps = new mssql.PreparedStatement(connection);   
+		
+		var inserts = {
+			id: parseInt(req.params.id)  
+		} 
+		
+		ps.input('id', mssql.Int);  
+		
+		ps.prepare('DELETE FROM items WHERE id=@id', function(err) {
+			if (err) console.log(err); 
+			
+			ps.execute(inserts, function(err, rows) {
+				if (err) console.log(err); 
+				
+				console.log('DELETE ' + req.url);
+                res.send('item deleted'); 
+				
+				ps.unprepare(); 
+			}); 
+		});
     }
 }

@@ -1,6 +1,6 @@
 ﻿// соединение с бд 
-var pool = require('./db_handler');
-var mysql = require('mysql');
+var connection = require('./db_handler');
+var mssql = require('mssql');
 var path = require('path'); 
 
 module.exports = {
@@ -8,57 +8,56 @@ module.exports = {
     loadItems: function (req, res) {
 
         // подключение к бд 
-        pool.getConnection(function (err, connection) {
 
-            if (err) console.log(err)
+		var request = new mssql.Request(connection);  
 
-            connection.query('SELECT * FROM `items`', function (err, rows) {
-                res.json(rows);
-                connection.release(); 
-                console.timeEnd(req.method + ' ' + req.url); 
-            });
-        });
+		request.query("SELECT * FROM items", function(err, rows) {
+			
+			if (err) console.log(err); 
+
+            console.timeEnd(req.method + ' ' + req.url); 
+			res.send('selected items: ' + JSON.stringify(rows));
+		}); 
 
     },
-
     // создание элемента 
     createItem: function (req, res) {
 
         // подключение к бд 
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
+		var request = new mssql.Request(connection);   
+		
+		request.query("INSERT INTO items (name, description, completed) VALUES ('Test', 'Some text', 1)", function(err, rows) {
+			
+			if (err) console.log(err); 
 
-            var sql = 'INSERT INTO `items`(name, description, completed) VALUES (?, ?, ?)';
-            var inserts = ['test item', 'test description', 1];
-            sql = mysql.format(sql, inserts);
-
-            connection.query(sql, function (err, rows) {
-
-                console.log('item created');
-                res.send('item created');
-                connection.release(); 
-                console.timeEnd(req.method + ' ' + req.url); 
-            });
-        })
+            console.timeEnd(req.method + ' ' + req.url);  
+			res.send('sample item added to database');
+			
+		}); 
     },
- 
+
     // удаление элемента 
     removeItem: function (req, res) {
 
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
-
-            var sql = 'DELETE FROM `items` WHERE id=?';
-            var inserts = req.params.id;
-            sql = mysql.format(sql, inserts);
-
-            connection.query(sql, function (err, rows) {
-
-                console.log('item deleted');
-                res.send('item deleted');
-                connection.release(); 
-                console.timeEnd(req.method + ' ' + req.url);  
-            })
-        })
+		var ps = new mssql.PreparedStatement(connection);   
+		
+		var inserts = {
+			id: parseInt(req.params.id)  
+		} 
+		
+		ps.input('id', mssql.Int);  
+		
+		ps.prepare('DELETE FROM items WHERE id=@id', function(err) {
+			if (err) console.log(err); 
+			
+			ps.execute(inserts, function(err, rows) {
+				if (err) console.log(err); 
+				
+				console.timeEnd(req.method + ' ' + req.url); 
+				res.send('item deleted from database');  
+				
+				ps.unprepare(); 
+			}); 
+		});
     }
 }

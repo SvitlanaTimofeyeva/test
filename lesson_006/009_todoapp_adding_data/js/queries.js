@@ -11,7 +11,7 @@ module.exports = {
 		
         var self = this; 		
 		self.tableRows = ``; 
-		connection.connect(function(err) {
+
 			var request = new mssql.Request(connection);  
 			request.stream = true; 
 			request.query("SELECT * FROM items"); 
@@ -30,13 +30,10 @@ module.exports = {
 				res.render('index', { data:  self.tableRows }); 
 			})		
 
-		})
     }, 
 	// добавить элемент в бд
 	insertItem: function (data, req, res) {
-		
 
-			connection.connect(function(err){
 
 					var inserts = {
 						
@@ -55,14 +52,14 @@ module.exports = {
 						if (err) console.log(err); 
 					    var request = ps.execute(inserts, function(err) { 
 						
-							console.log(err); 
+							if (err) console.log(err); 
 							console.log('add item'); 
+							ps.unprepare(); 
 
 						}); 
 				
 				
 				})
-			})
-
 	}
+
 }

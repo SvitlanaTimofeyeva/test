@@ -1,78 +1,83 @@
 ﻿// соединение с бд 
-var pool = require('./db_handler');
-var mysql = require('mysql');
+var connection = require('./db_handler');
+var mssql = require('mssql');
 var path = require('path');
 
 module.exports = {
-    // згрузка всех элементов
+    // загрузка всех элементов
     loadItems: function (req, res) {
 
         // подключение к бд 
-        pool.getConnection(function (err, connection) {
 
-            if (err) console.log(err)
+		var request = new mssql.Request(connection);  
 
-            connection.query('SELECT * FROM `items`', function (err, rows) {
-                res.json(rows);
-                connection.release();
-            });
-        });
+		request.query("SELECT * FROM items", function(err, rows) {
+			
+			if (err) console.log(err); 
+			console.log('GET ' + req.url);
+			res.send('selected items: ' + JSON.stringify(rows));
+		}); 
 
     },
     // создание элемента 
     createItem: function (req, res) {
 
         // подключение к бд 
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
-
-            var sql = 'INSERT INTO `items`(name, description, completed) VALUES (?, ?, ?)';
-            var inserts = ["Test Item", "Test Description", 0];
-            sql = mysql.format(sql, inserts);
-
-            connection.query(sql, function (err, rows) {
-
-                console.log('test item created');
-                res.send('test item created');
-                connection.release();
-            });
-        })
+		var request = new mssql.Request(connection);   
+		
+		request.query("INSERT INTO items (name, description, completed) VALUES ('Test', 'Some text', 1)", function(err, rows) {
+			
+			if (err) console.log(err); 
+			console.log('POST ' + req.url);
+			res.send('sample item added to database');
+			
+		}); 
     },
     // обновление элемента (редактирование) 
-    updateItem: function (req, res) {
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
-
-            var data = req.body;
-
-            var sql = 'UPDATE `items` SET name="newName", description="newDescription", completed=1 WHERE id=?';
-            var inserts = req.params.id; 
-            sql = mysql.format(sql, inserts);
-
-            connection.query(sql, function (err, rows) {
-
-                console.log('item by id ' + req.params.id + ' updated');
-                res.send('item by id ' + req.params.id + ' updated');
-                connection.release();
-            })
-        })
+    updateItem: function (req, res) { 
+	
+		var ps = new mssql.PreparedStatement(connection);   
+		
+		var inserts = {
+			id: parseInt(req.params.id)  
+		} 
+		
+		ps.input('id', mssql.Int); 
+		
+		ps.prepare('UPDATE items SET name="new Name", description="Some other text", completed=0 WHERE id=@id', function(err) {
+			if (err) console.log(err); 
+			
+			ps.execute(inserts, function(err, rows) {
+				if (err) console.log(err); 
+				
+				console.log('PUT ' + req.url);
+				res.send('item by id ' + req.params.id + ' changed');
+				ps.unprepare(); 
+			}); 
+		}); 
     },
     // удаление элемента 
     removeItem: function (req, res) {
 
-        pool.getConnection(function (err, connection) {
-            if (err) console.log(err)
-
-            var sql = 'DELETE FROM `items` WHERE id=?';
-            var inserts = req.params.id;
-            sql = mysql.format(sql, inserts);
-
-            connection.query(sql, function (err, rows) {
-
-                console.log('item by id ' + req.params.id + ' deleted');
-                res.send('item by id ' + req.params.id + ' deleted');
-                connection.release();
-            })
-        })
+		var ps = new mssql.PreparedStatement(connection);   
+		
+		var inserts = {
+			id: parseInt(req.params.id)  
+		} 
+		
+		ps.input('id', mssql.Int);  
+		
+		ps.prepare('DELETE FROM items WHERE id=@id', function(err) {
+			if (err) console.log(err); 
+			
+			ps.execute(inserts, function(err, rows) {
+				if (err) console.log(err); 
+				
+				console.log('DELETE ' + req.url);
+				res.send('item deleted from database');  
+				
+				ps.unprepare(); 
+			}); 
+		});
     }
 }

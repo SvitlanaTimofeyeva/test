@@ -4,7 +4,6 @@
 <head> 
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" /> 
-<link rel="stylesheet" type="text/css" href="css/style.css" />  
 <title>App</title> 
 <script>
 	window.onload = function() { 
@@ -14,17 +13,17 @@
 		tbody.addEventListener('click', function(e) {
 
 
-			if (e.target.parentNode.className == 'name') { 
+			if (e.target.hasAttribute('id')) { 
 
 				if (e.target.classList.contains('edit')) {
 
 					// запрос для редактирования элемента 
 					var xhr = new XMLHttpRequest(); 
-					xhr.open('GET', 'edit/' + e.target.parentNode.id); 
+					xhr.open('GET', e.target.id); 
 					xhr.send(); 
 
 					xhr.onload = function() {
-						location.href = 'http://localhost:1337/edit/' + e.target.parentNode.id; 
+						location.href = 'http://localhost:1337/edit/' + e.target.id; 
 					}
 				
 				} 

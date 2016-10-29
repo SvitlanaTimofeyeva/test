@@ -16,7 +16,7 @@ server.get('/api/', apiHandler.loadItems);
 
 server.post('/api/new', apiHandler.createItem);  
 
-server.del('/api/:id', apiHandler.removeItem);  
+server.del('/api/:id', apiHandler.removeItem);   
 
 server.get('/', function (req, res) {
     res.send('test get request'); 

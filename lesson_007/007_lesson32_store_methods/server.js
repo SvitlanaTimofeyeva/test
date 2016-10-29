@@ -8,31 +8,49 @@ var session = require('express-session');
 // подключение модуля express-mysql-session 
 var MySQLStore = require('express-mysql-session')(session);
 
+// подключение модуля connect-mssql
+var MSSQLStore = require('connect-mssql')(session);
 
-var options = {
-    // параметры соединения с бд 
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'dinamicka123',
-    database: 'session_test',
+var mssql = require('mssql');
 
-    // как часто будет проводиться удаление устаревших сессий(миллисекунды)
-    checkExpirationInterval: 900000,
-    // время устаревания сессии(миллисекунды)
-    expiration: 86400000
-};
+var config = {
+	
+	driver: 'tedious',   // драйвер mssql
+	user: 'demo_user',   // пользователь базы данных
+	password: '12345', 	 // пароль пользователя 
+	server: 'localhost', // хост
+	database: 'sessions',    // имя бд
+	port: 1433,			 // порт, на котором запущен sql server
+	pool: {
+        max: 10, // максимальное допустимое количество соединений пула 
+        min: 0,  // минимальное допустимое количество соединений пула 
+        idleTimeoutMillis: 30000 // время ожидания перед завершением неиспользуемого соединения 
+    }
+	
+	
+} 
+
 
 // создание хранилища для сессии 
-var sessionStore = new MySQLStore(options);
+var store =  new MSSQLStore(config); 
 
 app.use(session({
-
-    secret: 'secret',
+    store: new MSSQLStore(config), 
+	resave: false,
     saveUninitialized: true,
-    resave: true,
-    store: sessionStore
-}));
+    secret: 'supersecret'
+}));  
+
+
+// обработчик события установки соединения с хранилищем сессии 
+store.on('connect', function() {	
+	console.log('connected to session store'); 
+}); 
+	
+// обработчик события ошибки соединения с хранилищем сессии 
+store.on('error', function() {
+	console.log('sesssion store error'); 
+}); 
 
 app.get('/', function (req, res) {
 
@@ -46,33 +64,6 @@ app.get('/', function (req, res) {
     res.end('<h2>Number of reguests: ' + requestCount() + '</h2>' + 
         ' <h5>Refresh the page to increase count</h5>') 
 
-    // метод store.get(sessionID, cb) предоставляет доступ к сессии по ID 
-    sessionStore.get(req.sessionID, function (err, data) {
-
-        if (err) console.log(err);
-
-        var sessionObj = data;
-        console.log(sessionObj);
-
-        if (sessionObj.numberOfRequests > 9) {
-
-            // метод store.clear(cb) удаляет все сессии из хранилища 
-            sessionStore.clear(function (err) {
-
-                if (err) console.log(err);
-
-                console.log('store is cleared');
-
-            });
-        }
-    });
-
-    // метод store.length(cb) возвращает количество сохраненных сессий 
-    sessionStore.length(function (err, data) {
-        if (err) console.log(err);
-
-        console.log(data)
-    });
     
 });
 

@@ -4,16 +4,30 @@ var router = express.Router();
 
 var port = process.env.port || 1337; 
 
-var mysql = require('mysql');  
+var mssql = require('mssql');
 
-// пул соединений 
-var pool = mysql.createPool({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'dinamicka123',
-    database: 'todos' 
-})
+var config = {
+	
+	driver: 'tedious',   // драйвер mssql
+	user: 'demo_user',   // пользователь базы данных
+	password: '12345', 	 // пароль пользователя 
+	server: 'localhost', // хост
+	database: 'todos',    // имя бд
+	port: 1433,			 // порт, на котором запущен sql server
+	pool: {
+        max: 10, // максимальное допустимое количество соединений пула 
+        min: 0,  // минимальное допустимое количество соединений пула 
+        idleTimeoutMillis: 30000 // время ожидания перед завершением неиспользуемого соединения 
+    }
+	
+} 
+
+
+var connection = new mssql.Connection(config); 
+var pool = connection.connect(function(err) {
+	if (err) console.log(err)
+}); 
+
 
 // middleware для использования CORS  
 app.use(function (req, res, next) {
@@ -25,84 +39,101 @@ app.use(function (req, res, next) {
 router.get('/', function (req, res) {
 
     // подключение к бд 
-    pool.getConnection(function (err, connection) {
-        if (err) console.log(err)
-      
-        connection.query('SELECT * FROM `items`', function (err, rows) { 
-				
-            console.log('GET ' + req.url); 
-            res.status(200).send('selected items: ' + JSON.stringify(rows)); 
-            connection.release(); 
-        });
-    });
+	var request = new mssql.Request(connection);  
+
+	request.query("SELECT * FROM items", function(err, rows) {
+		
+		if (err) console.log(err); 
+        console.log('GET ' + req.url);
+		res.status(200).send('selected items: ' + JSON.stringify(rows));
+	}); 
 });
 
 router.get('/:id', function (req, res) {
 
     // подключение к бд 
-    pool.getConnection(function (err, connection) {
-        if (err) console.log(err)
-
-        connection.query('SELECT * FROM `items` WHERE id=' + req.params.id, function (err, rows) {
-
-            console.log('GET ' + req.url);
-            res.status(200).send('selected item: ' + JSON.stringify(rows));
-            connection.release();
-        });
-    });
+	var ps = new mssql.PreparedStatement(connection);   
+	
+	var inserts = {
+		id: parseInt(req.params.id)  
+	} 
+	
+	ps.input('id', mssql.Int); 
+	
+	ps.prepare('SELECT * FROM items WHERE id=@id', function(err) {
+		if (err) console.log(err); 
+		
+		ps.execute(inserts, function(err, rows) { 
+		
+				if (err) console.log(err); 
+			
+				console.log('GET ' + req.url);
+				res.status(200).send('selected item: ' + JSON.stringify(rows));
+				ps.unprepare();  
+				
+		}); 
+	}); 
 });
 
 router.post('/', function (req, res) {
 
     // подключение к бд 
-    pool.getConnection(function (err, connection) {
-        if (err) console.log(err)
-
-        connection.query('INSERT INTO `items`(name, description, completed) VALUES ("Test", "Some text", 1)', function (err) {
-
-            console.log('POST ' + req.url);
-            res.status(200).send('sample item added to database');
-            connection.release();
-        });
-    });
+	var request = new mssql.Request(connection);   
+	
+	request.query("INSERT INTO items (name, description, completed) VALUES ('Test', 'Some text', 1)", function(err, rows) {
+		
+		if (err) console.log(err); 
+        console.log('POST ' + req.url);
+        res.status(200).send('sample item added to database');
+		
+	}); 
 });
 
 router.put('/:id', function (req, res) {
     // подключение к бд 
-    pool.getConnection(function (err, connection) {
-        if (err) console.log(err)
-
-        connection.query('UPDATE `items` SET name="new Name", description="Some other text", completed=0 WHERE id=' + pool.escape(req.params.id), function (err) {
-
-            if (err) {
-                console.log(err)
-                return; 
-            }
-
-            console.log('PUT ' + req.url);
+	var ps = new mssql.PreparedStatement(connection);   
+	
+	var inserts = {
+		id: parseInt(req.params.id)  
+	} 
+	
+	ps.input('id', mssql.Int); 
+	
+	ps.prepare("UPDATE items SET name='new Name', description='Some other text', completed=0 WHERE id=@id", function(err) {
+		if (err) console.log(err); 
+		
+		ps.execute(inserts, function(err, rows) {
+			if (err) console.log(err); 
+			
+			console.log('PUT ' + req.url);
             res.status(200).send('item by id ' + req.params.id + ' changed');
-            connection.release();
-        });
-    });
+			ps.unprepare(); 
+		}); 
+	}); 
 });
 
 router.delete('/:id', function (req, res) {
     // подключение к бд 
-    pool.getConnection(function (err, connection) {
-        if (err) console.log(err)
-
-        connection.query('DELETE FROM `items` WHERE id=' + pool.escape(req.params.id), function (err) {
-
-            if (err) {
-                console.log(err) 
-                return;
-            }
-
+	var ps = new mssql.PreparedStatement(connection);   
+	
+	var inserts = {
+		id: parseInt(req.params.id)  
+	} 
+	
+	ps.input('id', mssql.Int);  
+	
+	ps.prepare('DELETE FROM items WHERE id=@id', function(err) {
+		if (err) console.log(err); 
+		
+		ps.execute(inserts, function(err, rows) {
+			if (err) console.log(err); 
+			
             console.log('DELETE ' + req.url);
-            res.status(200).send('item deleted from database');
-            connection.release();
-        });
-    });
+            res.status(200).send('item deleted from database');  
+			
+			ps.unprepare(); 
+		}); 
+	});
 });
 
 // использовать роутер на пути /api 
