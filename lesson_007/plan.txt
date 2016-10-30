@@ -1,4 +1,0 @@
-1. chanhe session_store 
-2. add example of cookies 
-3. change hw and classwork 
-4. update presentation 
