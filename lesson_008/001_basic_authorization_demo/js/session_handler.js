@@ -1,26 +1,31 @@
 ﻿var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
-// подключение модуля express-mysql-session 
-var MySQLStore = require('express-mysql-session')(session);
+// подключение модуля connect-mssql
+var MSSQLStore = require('connect-mssql')(session);
+var mssql = require('mssql'); 
 
 module.exports = {
 
     createStore: function () {
 
-        var options = {
-            // параметры соединения с бд 
-            host: 'localhost',
-            port: 3306,
-            user: 'root',
-            password: '',
-            database: 'session_test',
+        var config = {
 
-            checkExpirationInterval: 900000,
-            expiration: 86400000
-        };
+            driver: 'tedious',   // драйвер mssql
+            user: 'demo_user',   // пользователь базы данных
+            password: '12345', 	 // пароль пользователя 
+            server: 'localhost', // хост
+            database: 'sessions',    // имя бд
+            port: 1433,			 // порт, на котором запущен sql server
+            pool: {
+                max: 10, // максимальное допустимое количество соединений пула 
+                min: 0,  // минимальное допустимое количество соединений пула 
+                idleTimeoutMillis: 30000 // время ожидания перед завершением неиспользуемого соединения 
+            }
 
-        // создание хранилища для сессии 
-        return sessionStore = new MySQLStore(options); 
+
+        } 
+
+        return new MSSQLStore(config); 
     }
 }

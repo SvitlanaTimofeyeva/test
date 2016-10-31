@@ -25,11 +25,10 @@ var store = sessionHandler.createStore();
 // создание сессии 
 app.use(cookieParser());
 app.use(session({
-
-    secret: 'secret',
+    store: store,
+    resave: false,
     saveUninitialized: true,
-    resave: true,
-    store: store
+    secret: 'supersecret'
 })); 
 
 app.get('/', function(req, res) {

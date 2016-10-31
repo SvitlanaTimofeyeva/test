@@ -1,9 +1,0 @@
-1. basic auth 
-2. auth with encrypted pass
-3. auth with session 
-4. auth with db 
-5. auth with session and db and pass 
-
-6. sign up with db 
-7. contact form handling without db 
-8. contact form handling with db 

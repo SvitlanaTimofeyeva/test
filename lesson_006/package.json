@@ -1,9 +1,0 @@
-{
-  "name": "lesson_006",
-  "version": "0.0.0",
-  "description": "lesson_006",
-  "main": "server.js",
-  "author": {
-    "name": "Boss"
-  }
-}
