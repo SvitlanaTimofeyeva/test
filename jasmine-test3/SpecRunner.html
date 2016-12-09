@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Jasmine Spec Runner v2.5.2</title>
+
+  <link rel="shortcut icon" type="image/png" href="lib/jasmine-2.5.2/jasmine_favicon.png">
+  <link rel="stylesheet" href="lib/jasmine-2.5.2/jasmine.css">
+  <link href="css/style.css" rel="stylesheet" />
+
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+
+  <script src="lib/inputmask.js"></script>
+  <script src="lib/vivus.min.js"></script>
+  <script src="lib/jasmine-2.5.2/jasmine.js"></script>
+  <script src="lib/jasmine-2.5.2/jasmine-html.js"></script>
+  <script src="lib/jasmine-2.5.2/boot.js"></script>
+
+<style>
+    .invalid {
+        background-color: rgb(255, 140, 151); 
+    }
+
+    .valid {
+        background-color: rgb(117, 247, 116); 
+    }
+</style>
+</head>
+
+<body id="body">
+        <!--form-->
+        <div class="form-wrap">
+
+            <!--1 category-->
+            <div class="category-wrap" data-category="0" data-subs="6">
+
+                <!--category heading-->
+                <div class="category-heading">
+                    <h1>TEST FORM</h1>
+                    <p></p>
+                </div>
+                <div class="content-wrap">
+                    <!--basic organization information-->
+                    <div class="input-wrap" data-sub="0">
+
+                        <div class="stats-wrap">
+                            <label class="form-label" id="label00">Basic Organization Information</label>
+                            <p class="sub" id="sub00"></p>
+                            <span class="small-stats" id="stats00" data-max="3">0/4</span>
+                        </div>
+
+
+                        <div class="active-wrap" data-q="1" data-category="0" data-sub="0">
+                            <form class="input-form" data-max="3" name="01" data-category="0" data-q="1" data-sub="0">
+                                <input data-sub="0" name="ein" data-q="1" required data-prompt="Enter this 9-digit number using the following format XX-XXXXXXX. EIN is an Employer Identification Number assigned by the IRS to identify a particular organization" class="req form-input addmask showprompt map-input autofocus" data-maskval="99-9999999" id="inp00" placeholder="Employer Identification Number (EIN)*" />
+                                <input type="submit" class="submit" data-sub="0" data-q="1" />
+                            </form>
+                        </div>
+
+                        <div class="hidden-wrap" data-q="2" data-category="0" data-sub="0">
+                            <form class="input-form" data-max="3" name="02" data-category="0" data-q="2" data-sub="0">
+                                <input data-sub="0" name="name" data-q="2" required class="map-input req form-input" type="text" placeholder="Full legal name of the organization*" />
+                                <input type="submit" class="submit" data-sub="0" data-q="2" />
+                            </form>
+
+
+                        </div>
+                        <div class="hidden-wrap" data-q="3" data-category="0" data-sub="0">
+                            <form class="input-form" data-max="3" name="03" data-category="0" data-q="3" data-sub="0">
+                                <input data-sub="0" name="aka" data-q="3" class="map-input form-input" type="text" placeholder="Your organization is also known as (AKA)" />
+                                <input type="submit" class="submit" data-sub="0" data-q="3" />
+                            </form>
+                        </div>
+
+
+                            <div class="input-overlay" data-sub="0"></div>
+
+
+
+                            <div class="right" data-sub="0" data-q="1" id="right0" data-max="3">
+
+                                <div class="icon arr-icon"></div>
+                            </div>
+                            <div class="wrong" data-sub="0" id="wrong0">
+                                <div class="icon cross-icon"></div>
+                            </div>
+
+                            <div class="prompt big-prompt" data-q="1">
+                                <span class="sp">Enter this 9-digit number using the following format XX-XXXXXXX. EIN is an Employer Identification Number assigned by the IRS to identify a particular organization</span>
+                            </div>
+
+
+                            <div class="input-meter">
+                                <div class="meter-span"></div>
+                            </div>
+                            <div class="thanx">
+                                <div class="check-container">
+                                    <svg version="1.1" id="c00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="75px" height="75px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+                                    <path fill="none" stroke="#fff" stroke-linecap="round" stroke-width="5" stroke-miterlimit="5" id="checkmark" d="M41.8,18.4L24.061,35.045l-1.838,1.524c-1,1-2.049,0.238-3.049-0.762L8.8,26.9
+					c-0.925-1.495-0.477-2.571,0.106-3.109l0.583-0.045c0.135-0.224,0.852,0.045,1.659,0.493l10.223,8.519l17.486-16.096
+					c0.763-0.717,2.152-1.435,2.646-1.166L42.04,15.9C42.398,16.528,42.8,17.4,41.8,18.4z"></path>
+				    </svg>
+
+                                    <p class="thanx-p">Thank you!</p>
+                                </div>
+                                <div class="big-input-meter"></div>
+                            </div>
+
+                        </div>
+
+                    <div class="input-wrap" data-sub="1">
+
+                        <div class="stats-wrap">
+                            <label class="form-label" id="label00">Test Field</label>
+                            <p class="sub" id="sub00"></p>
+                            <span class="small-stats" id="stats00" data-max="3">0/4</span>
+                        </div>
+
+
+                        <div class="active-wrap" data-q="1" data-category="0" data-sub="1">
+                            <form class="input-form" data-max="3" name="01" data-category="0" data-q="1" data-sub="1">
+                                <input data-sub="1" name="ein" data-q="1" required data-prompt="Enter this 9-digit number using the following format XX-XXXXXXX. EIN is an Employer Identification Number assigned by the IRS to identify a particular organization" class="req form-input addmask showprompt map-input autofocus" data-maskval="(999)99-99-99" placeholder="Phone" />
+                                <input type="submit" class="submit" data-sub="1" data-q="1" />
+                            </form>
+                        </div>
+
+                        <div class="hidden-wrap" data-q="2" data-category="0" data-sub="1">
+                            <form class="input-form" data-max="3" name="02" data-category="0" data-q="2" data-sub="1">
+                                <input data-sub="1" name="name" data-q="2" required class="map-input req form-input" type="text" placeholder="Stuff*" />
+                                <input type="submit" class="submit" data-sub="1" data-q="2" />
+                            </form>
+
+
+                        </div>
+                        <div class="hidden-wrap" data-q="3" data-category="0" data-sub="1">
+                            <form class="input-form" data-max="3" name="03" data-category="0" data-q="3" data-sub="1">
+                                <input data-sub="1" name="aka" data-q="3" class="map-input form-input" type="text" placeholder="Some text" />
+                                <input type="submit" class="submit" data-sub="1" data-q="3" />
+                            </form>
+                        </div>
+
+
+                        <div class="input-overlay" data-sub="1"></div>
+
+
+
+                        <div class="right" data-sub="1" data-q="1" data-max="3">
+
+                            <div class="icon arr-icon"></div>
+                        </div>
+                        <div class="wrong" data-sub="1">
+                            <div class="icon cross-icon"></div>
+                        </div>
+
+
+                        <div class="input-meter">
+                            <div class="meter-span"></div>
+                        </div>
+                        <div class="thanx">
+                            <div class="check-container">
+                                <svg version="1.1" id="c01" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="75px" height="75px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+                                <path fill="none" stroke="#fff" stroke-linecap="round" stroke-width="5" stroke-miterlimit="5" id="checkmark" d="M41.8,18.4L24.061,35.045l-1.838,1.524c-1,1-2.049,0.238-3.049-0.762L8.8,26.9
+					c-0.925-1.495-0.477-2.571,0.106-3.109l0.583-0.045c0.135-0.224,0.852,0.045,1.659,0.493l10.223,8.519l17.486-16.096
+					c0.763-0.717,2.152-1.435,2.646-1.166L42.04,15.9C42.398,16.528,42.8,17.4,41.8,18.4z"></path>
+				    </svg>
+
+                                <p class="thanx-p">Thank you!</p>
+                            </div>
+                            <div class="big-input-meter"></div>
+                        </div>
+
+                    </div>
+
+                    <div class="continue-btn-container">
+                        <button id="continue-btn" class="continue-btn view-preview" data-category="0" data-view="1" data-max="3">Continue</button>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+
+    <div class="thank-you-screen">
+        <div>Thank you for your time!</div>
+    </div>
+
+    <!-- include source files here... -->
+    <script src="src/form_handler.js"></script>
+
+    <!-- include spec files here... -->
+    <script src="spec/formSpec.js"></script>
+
+</body>
+</html>
