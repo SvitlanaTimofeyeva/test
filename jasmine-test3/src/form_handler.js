@@ -1,4 +1,4 @@
-﻿function AnimationHandler(fieldwrap, r, w) {
+﻿function InputHandler(fieldwrap, r, w) {
     this.wrap = fieldwrap;
 
     this.active_form = '',
@@ -115,7 +115,8 @@
 
     this.show_thank_you_screen = function () {
 
-        var self = this; 
+        var self = this;
+
         var thanx = this.wrap.find('.thanx');
 
         thanx.css({
@@ -150,7 +151,10 @@
     this.focus_handler = function () {
 
         var self = this;
-        this.wrap.find('.map-input').on('input', function (e) { 
+
+        this.wrap.find('.map-input').on('input', function (e) {
+      
+
             $(this).css({
                 'color': '#1f467d'
             })
@@ -175,7 +179,12 @@
                     if (self.w.width() > 0) {
                         self.hide(self.w, self.show(self.r));
                     } else {
-                        self.show(self.r)
+                        if (!$(this).hasClass('addmask')) {
+                            self.show(self.r)
+                        }
+                           
+                        
+
                     }
 
                 } else {
@@ -266,91 +275,42 @@
                 self.addClass('invalid')
             }
             function validMask() {
-
-                if (!self.hasClass('multi-zip')) {
-                    self.removeClass('invalid');
-                    if (typeof ct != 'undefined') {
-                        var err_p = $('.error[data-ct="' + ct + '"]');
-                        err_p.html('');
-                    }
-                }
+                self.removeClass('invalid');
             }
         });
 
     }
 
-    this.test_vals = ['099786653', '54645675', '45654654455', 'some text', 'some@mail']
-    this.test_validation = function () {
-        if (this.inputs.length == 0) {
-            console.log('No inputs to validate. Test failed.');
-            return false; 
-        }
+    this.test_vals = ['099786653', '54645675', '45654654455', 'some text', 'some@mail'];
 
-        var isValid = true; 
+}
 
-        for (var i = 0; i < this.inputs.length; i++) {
-            for (var j = 0; j < this.test_vals.length; j++) {
+var handlers = []; 
+function add_handlers() {
+    var wraps = $('.input-wrap');
 
-                
-                this.inputs.eq(i).trigger('input');
-                this.inputs.eq(i).val(this.test_vals[j]);
-                this.inputs.eq(i).trigger('input');
+    for (var i = 0; i < wraps.length; i++) {
+        handlers.push(new InputHandler(wraps.eq(i), wraps.eq(i).find('.right'), wraps.eq(i).find('.wrong')));
 
-                if (this.inputs.eq(i).hasClass('addmask')) {
-                    if (typeof this.inputs.eq(i).attr('data-maskval') == 'undefined') {
-                        console.log('Invalid mask on input ' + (parseInt(this.inputs.eq(i).attr('data-q')) - 1) + ' in form subcategory ' + this.inputs.eq(i).attr('data-sub'));
-                        isValid = false; 
-                    }
-
-                    
-
-                   // console.log('inputmask validity on input ' + i + ' ' + mask_test + ' with value ' + this.inputs.eq(i).val() + ' and compared value ' + this.test_vals[j]);
-
-                    if (typeof this.inputs.eq(i).attr('data-maskval') != 'undefined' && this.inputs.eq(i).hasClass('invalid')) {
-                        var mask_test = Inputmask.isValid(this.inputs.eq(i).val(), { alias: this.inputs.eq(i).attr('data-maskval') });
-                        if (mask_test) {
-                            console.log('validation error on input ' + i + ' with value ' + this.inputs.eq(i).inputmask('unmaskedvalue') + ', compared value ' + this.test_vals[j] + ' and mask ' + this.inputs.eq(i).attr('data-maskval'));
-                        } 
-                    }
+        handlers[i].set_forms();
+        handlers[i].set_inputs();
+        handlers[i].add_mask();
+        handlers[i].focus_handler();
+        handlers[i].animate_q_change();
 
 
-                    if (typeof this.inputs.eq(i).attr('data-maskval') != 'undefined' && !this.inputs.eq(i).hasClass('invalid')) {
-                        var mask_test = Inputmask.isValid(this.inputs.eq(i).val(), { alias: this.inputs.eq(i).attr('data-maskval') });
-                        if (!mask_test) {
-                            console.log('validation error on input ' + i + ' with value ' + this.inputs.eq(i).inputmask('unmaskedvalue') + ', compared value ' + this.test_vals[j] + ' and mask ' + this.inputs.eq(i).attr('data-maskval'));
-                        }
-                    }
-                }
-            }
-
-            if (!isValid) {
-                return false; 
-            }
-
- 
-        }
     }
 }
 
+add_handlers();
 
-
-var formhandler1 = new AnimationHandler($('.input-wrap[data-sub="0"]'), $('.input-wrap[data-sub="0"]').find('.right'), $('.input-wrap[data-sub="0"]').find('.wrong'));
-formhandler1.set_forms();
-formhandler1.set_inputs(); 
-formhandler1.add_mask();
-formhandler1.focus_handler();
-formhandler1.animate_q_change();
-formhandler1.test_validation(); 
-
-var formhandler2 = new AnimationHandler($('.input-wrap[data-sub="1"]'), $('.input-wrap[data-sub="1"]').find('.right'), $('.input-wrap[data-sub="1"]').find('.wrong'));
-formhandler2.set_forms();
-formhandler2.set_inputs();
-formhandler2.add_mask();
-formhandler2.focus_handler();
-formhandler2.animate_q_change();
 
 $('#continue-btn').on('click', function () {
+
     $('.form-wrap').fadeOut(500, function () {
+        $('.thank-you-screen').css({
+            'display': 'table'
+        })
         $('.thank-you-screen').animate({
             opacity: 1
         }, 500);

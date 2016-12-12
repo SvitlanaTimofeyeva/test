@@ -1126,7 +1126,7 @@ p {
 .thank-you-screen {
     z-index: -1;
     opacity: 0;
-    display: table;
+    display: none; 
     height: 953px;
     width: 100%;
 }
