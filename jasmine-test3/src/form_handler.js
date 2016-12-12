@@ -223,9 +223,6 @@
         })
     }
 
-    this.validate_input = function () {
-
-    }
     this.add_mask = function () {
 
         this.wrap.find('.addmask').on('input', function (e) {
@@ -281,6 +278,58 @@
         });
 
     }
+
+    this.test_vals = ['099786653', '54645675', '45654654455', 'some text', 'some@mail']
+    this.test_validation = function () {
+        if (this.inputs.length == 0) {
+            console.log('No inputs to validate. Test failed.');
+            return false; 
+        }
+
+        var isValid = true; 
+
+        for (var i = 0; i < this.inputs.length; i++) {
+            for (var j = 0; j < this.test_vals.length; j++) {
+
+                
+                this.inputs.eq(i).trigger('input');
+                this.inputs.eq(i).val(this.test_vals[j]);
+                this.inputs.eq(i).trigger('input');
+
+                if (this.inputs.eq(i).hasClass('addmask')) {
+                    if (typeof this.inputs.eq(i).attr('data-maskval') == 'undefined') {
+                        console.log('Invalid mask on input ' + (parseInt(this.inputs.eq(i).attr('data-q')) - 1) + ' in form subcategory ' + this.inputs.eq(i).attr('data-sub'));
+                        isValid = false; 
+                    }
+
+                    
+
+                   // console.log('inputmask validity on input ' + i + ' ' + mask_test + ' with value ' + this.inputs.eq(i).val() + ' and compared value ' + this.test_vals[j]);
+
+                    if (typeof this.inputs.eq(i).attr('data-maskval') != 'undefined' && this.inputs.eq(i).hasClass('invalid')) {
+                        var mask_test = Inputmask.isValid(this.inputs.eq(i).val(), { alias: this.inputs.eq(i).attr('data-maskval') });
+                        if (mask_test) {
+                            console.log('validation error on input ' + i + ' with value ' + this.inputs.eq(i).inputmask('unmaskedvalue') + ', compared value ' + this.test_vals[j] + ' and mask ' + this.inputs.eq(i).attr('data-maskval'));
+                        } 
+                    }
+
+
+                    if (typeof this.inputs.eq(i).attr('data-maskval') != 'undefined' && !this.inputs.eq(i).hasClass('invalid')) {
+                        var mask_test = Inputmask.isValid(this.inputs.eq(i).val(), { alias: this.inputs.eq(i).attr('data-maskval') });
+                        if (!mask_test) {
+                            console.log('validation error on input ' + i + ' with value ' + this.inputs.eq(i).inputmask('unmaskedvalue') + ', compared value ' + this.test_vals[j] + ' and mask ' + this.inputs.eq(i).attr('data-maskval'));
+                        }
+                    }
+                }
+            }
+
+            if (!isValid) {
+                return false; 
+            }
+
+ 
+        }
+    }
 }
 
 
@@ -291,6 +340,7 @@ formhandler1.set_inputs();
 formhandler1.add_mask();
 formhandler1.focus_handler();
 formhandler1.animate_q_change();
+formhandler1.test_validation(); 
 
 var formhandler2 = new AnimationHandler($('.input-wrap[data-sub="1"]'), $('.input-wrap[data-sub="1"]').find('.right'), $('.input-wrap[data-sub="1"]').find('.wrong'));
 formhandler2.set_forms();
